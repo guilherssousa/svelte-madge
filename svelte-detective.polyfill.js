@@ -46,7 +46,8 @@ function decoratePrecinct() {
 }
 
 function configCabinet() {
-  let webpackResolve;
+  /** @type{import("enhanced-resolve")} */
+  let resolve;
 
   const isRelative = require("is-relative-path");
 
@@ -64,7 +65,7 @@ function configCabinet() {
     directory,
     webpackConfig,
   }) {
-    if (!webpackResolve) webpackResolve = require("enhanced-resolve");
+    if (!resolve) resolve = require("enhanced-resolve");
 
     webpackConfig = path.resolve(webpackConfig);
     let loadedConfig;
@@ -103,11 +104,31 @@ function configCabinet() {
     }
 
     try {
-      const resolver = webpackResolve.create.sync(resolveConfig);
+      const resolver = resolve.create.sync(resolveConfig);
       dependency = stripLoader(dependency);
       const lookupPath = isRelative(dependency)
         ? path.dirname(filename)
         : directory;
+      return resolver(lookupPath, dependency);
+    } catch (e) {
+      debug("error when resolving " + dependency);
+      debug(e.message);
+      debug(e.stack);
+      return "";
+    }
+  }
+
+  function resolveES6Path({ dependency, filename, directory }) {
+    if (!resolve) resolve = require("enhanced-resolve");
+
+    try {
+      const resolver = resolve.create.sync();
+      dependency = stripLoader(dependency);
+
+      const lookupPath = isRelative(dependency)
+        ? path.dirname(filename)
+        : directory;
+
       return resolver(lookupPath, dependency);
     } catch (e) {
       debug("error when resolving " + dependency);
@@ -146,6 +167,12 @@ function configCabinet() {
       case "amd":
       case "commonjs":
       case "es6":
+        debug("using node resolver for es6");
+        return resolveES6Path({
+          dependency,
+          filename,
+          directory,
+        });
       default:
         throw new Error("only webpack");
     }
