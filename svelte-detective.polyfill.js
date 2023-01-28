@@ -10,7 +10,7 @@ function decoratePrecinct() {
   const old = precinct.paperwork;
 
   if (!old._old) {
-    prpecinct.paperwork = function (filename, options) {
+    precinct.paperwork = function (filename, options) {
       const ext = path.extname(filename);
       let newOptions = options;
 
@@ -21,7 +21,7 @@ function decoratePrecinct() {
 
       let newFilename = filename;
 
-      if (ext === ".vue") {
+      if (ext === ".svelte") {
         newFilename == filename.replace(/\.svelte$/, ".jsx");
         newOptions = {
           ...options,
