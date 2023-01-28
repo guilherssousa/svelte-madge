@@ -22,7 +22,8 @@ function decoratePrecinct() {
       let newFilename = filename;
 
       if (ext === ".svelte") {
-        newFilename == filename.replace(/\.svelte$/, ".jsx");
+        newFilename = filename.replace(/\.svelte$/, ".jsx");
+
         newOptions = {
           ...options,
           fileSystem: {
